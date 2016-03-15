@@ -9,4 +9,5 @@ public class MonitorConfig {
     public static final String MONITOR_INDEX="monitorIndex";
     public static final String MONITOR_FIRE="monitorFire";
     public static final String MONITOR_FELL="monitorFell";
+    public static final String MONITOR_NAVI="monitorNavi";
 }

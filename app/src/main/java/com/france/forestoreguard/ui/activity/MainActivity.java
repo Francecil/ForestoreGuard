@@ -65,7 +65,7 @@ public class MainActivity extends BaseActivity {
     HashMap<String, Marker> indexDetailOptions = new HashMap<String, Marker>();
     HashMap<String, Marker> fireDetailOptions = new HashMap<String, Marker>();
     HashMap<String, Marker> fellDetailOptions = new HashMap<String, Marker>();
-
+    HashMap<String,Marker> naviDetailOptions=new HashMap<>();
     HashMap<String, List<Marker>> indexMarkers = new HashMap<>();
     HashMap<String, List<Marker>> fireMarkers = new HashMap<>();
     HashMap<String, List<Marker>> fellMarkers = new HashMap<>();
@@ -195,6 +195,78 @@ public class MainActivity extends BaseActivity {
     }
 
     private void showNavi() {
+        Iterator iterator = monitors.iterator();
+        int monitorIndex = 0;
+        boolean hasMarker=naviDetailOptions!=null&&naviDetailOptions.size()>0;
+        while (iterator.hasNext()) {
+            Monitor monitor = (Monitor) iterator.next();
+            if (monitor.isFelled()) {
+                List<Marker> markers0 = indexMarkers.get(monitor.getForest_id());
+                markers0.get(0).setVisible(false);
+                markers0.get(1).setVisible(false);
+                List<Marker> markers = fellMarkers.get(monitor.getForest_id());
+                if (markers != null && markers.size() > 0) {
+                    markers.get(0).setVisible(true);
+                    markers.get(1).setVisible(true);
+                    markers.get(1).setToTop();
+                    markers.get(0).setToTop();
+                } else {
+                    BitmapDescriptor map_fell_fell = BitmapDescriptorFactory
+                            .fromResource(R.drawable.map_fell_fell);
+                    BitmapDescriptor map_fell_circle = BitmapDescriptorFactory
+                            .fromResource(R.drawable.map_fell_circle);
+                    List<Marker> markers2 = new ArrayList<>();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(MonitorConfig.MONITOR_ID, monitorIndex);
+                    bundle.putString(MonitorConfig.MONITOR_INFO, MonitorConfig.MONITOR_FELL);
+                    markers2.add((Marker) mBaiduMap.addOverlay(new MonitorMarkerOptions().position(monitor.getLatLng()).zIndex(19).icon(map_fell_fell).anchor(0.5f, 0.5f).setMonitor(monitor).extraInfo(bundle)));
+                    markers2.add((Marker) mBaiduMap.addOverlay(new MonitorMarkerOptions().position(monitor.getLatLng()).zIndex(19).icon(map_fell_circle).anchor(0.5f, 0.5f).setMonitor(monitor).extraInfo(bundle)));
+                    fellMarkers.put(monitor.getForest_id(), markers2);
+                }
+            } else if (monitor.isFired()){
+                List<Marker> markers0 = indexMarkers.get(monitor.getForest_id());
+                markers0.get(0).setVisible(false);
+                markers0.get(1).setVisible(false);
+                List<Marker> markers = fireMarkers.get(monitor.getForest_id());
+                if (markers != null && markers.size() > 0) {
+                    markers.get(0).setVisible(true);
+                    markers.get(1).setVisible(true);
+                    markers.get(1).setToTop();
+                    markers.get(0).setToTop();
+                } else {
+                    BitmapDescriptor map_fire_fire = BitmapDescriptorFactory
+                            .fromResource(R.drawable.map_fire_fire);
+                    BitmapDescriptor map_fire_circle = BitmapDescriptorFactory
+                            .fromResource(R.drawable.map_fire_circle);
+                    List<Marker> markers2 = new ArrayList<>();
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(MonitorConfig.MONITOR_ID, monitorIndex);
+                    bundle.putString(MonitorConfig.MONITOR_INFO, MonitorConfig.MONITOR_FIRE);
+                    markers2.add((Marker) mBaiduMap.addOverlay(new MonitorMarkerOptions().position(monitor.getLatLng()).zIndex(19).icon(map_fire_fire).anchor(0.5f, 0.5f).setMonitor(monitor).extraInfo(bundle)));
+                    markers2.add((Marker) mBaiduMap.addOverlay(new MonitorMarkerOptions().position(monitor.getLatLng()).zIndex(19).icon(map_fire_circle).anchor(0.5f, 0.5f).setMonitor(monitor).extraInfo(bundle)));
+                    fireMarkers.put(monitor.getForest_id(), markers2);
+                }
+            }else{
+                List<Marker> markers0 = indexMarkers.get(monitor.getForest_id());
+                markers0.get(0).setVisible(true);
+                markers0.get(1).setVisible(true);
+            }
+            //设置巡察时间;
+            if(!hasMarker) {
+                Bundle bundle = new Bundle();
+                bundle.putInt(MonitorConfig.MONITOR_ID, monitorIndex);
+                bundle.putString(MonitorConfig.MONITOR_INFO, MonitorConfig.MONITOR_NAVI);
+                View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_marker_monitor_navitime, null);
+                TextView textView=(TextView)view.findViewById(R.id.time_search);
+                textView.setText(monitor.getSearchTime());
+                BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromBitmap(getViewBitmap(view));
+                naviDetailOptions.put(monitor.getForest_id(), (Marker) mBaiduMap.addOverlay(new MonitorMarkerOptions().position(monitor.getLatLng()).zIndex(19).icon(markerIcon).anchor(0.5f, 0f).setMonitor(monitor).extraInfo(bundle)));
+            }
+            Marker marker=naviDetailOptions.get(monitor.getForest_id());
+            marker.setVisible(true);
+            marker.setToTop();
+            monitorIndex++;
+        }
     }
 
     /*
@@ -226,7 +298,14 @@ public class MainActivity extends BaseActivity {
             marker.setVisible(false);
         }
     }
-
+    private void clearNaviDetailMarkers(){
+        Iterator iterator = naviDetailOptions.entrySet().iterator();
+        while (iterator.hasNext()) {
+            HashMap.Entry map = (HashMap.Entry) iterator.next();
+            Marker marker = (Marker) map.getValue();
+            marker.setVisible(false);
+        }
+    }
     //    private void clearIndex(){}
 //    private void clearFire(){}
 //    private void clearFell(){}
@@ -357,10 +436,10 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initMonitors() {
-        monitors.add(new Monitor("aaa", 26.067144, 119.209095, false, false, false).setmDeviceStatus(new DeviceStatus(false, true, true)));
-        monitors.add(new Monitor("bbb", 26.047144, 119.189095, true, false, true).setmDeviceStatus(new DeviceStatus(true, true, true)).setFellTime(new Date("2010/04/04 04:04:04")));
-        monitors.add(new Monitor("ccc", 26.047144, 119.209095, false, true, true).setmDeviceStatus(new DeviceStatus(false, false, true)).setFireTime(new Date("2010/01/01 01:01:01")).setFellTime(new Date("2010/02/02 02:02:02")));
-        monitors.add(new Monitor("ddd", 26.067144, 119.189095, false, true, false).setmDeviceStatus(new DeviceStatus(true, true, false)).setFireTime(new Date("2010/03/03 03:03:03")));
+        monitors.add(new Monitor("aaa", 26.067144, 119.209095, false, false, false).setmDeviceStatus(new DeviceStatus(false, true, true)).setSearchTime("13:20 ~ 14.20"));
+        monitors.add(new Monitor("bbb", 26.047144, 119.189095, true, false, true).setmDeviceStatus(new DeviceStatus(true, true, true)).setFellTime(new Date("2010/04/04 04:04:04")).setSearchTime("14:50 ~ 15.20"));
+        monitors.add(new Monitor("ccc", 26.047144, 119.209095, false, true, false).setmDeviceStatus(new DeviceStatus(false, false, true)).setFireTime(new Date("2010/01/01 01:01:01")).setSearchTime("16:20 ~ 17.20"));
+        monitors.add(new Monitor("ddd", 26.067144, 119.189095, false, true, false).setmDeviceStatus(new DeviceStatus(true, true, false)).setFireTime(new Date("2010/03/03 03:03:03")).setSearchTime("09:20 ~ 11.20"));
 
         //构建Marker图标 相同图案的 icon 的 Marker 最好使用同一个 BitmapDescriptor 对象以节省内存空间
         BitmapDescriptor status_green_eye = BitmapDescriptorFactory
@@ -434,6 +513,7 @@ public class MainActivity extends BaseActivity {
         clearIndexDetailMarkers();
         clearFireDetailMarkers();
         clearFellDetailMarkers();
+        clearNaviDetailMarkers();
         mBaiduMap.hideInfoWindow();
         switch (view.getId()) {
             case R.id.map_button_fire:
@@ -469,6 +549,9 @@ public class MainActivity extends BaseActivity {
                     break;
                 case 1:
                     showFell();
+                    break;
+                case 2:
+                    showNavi();
                     break;
             }
         } else {

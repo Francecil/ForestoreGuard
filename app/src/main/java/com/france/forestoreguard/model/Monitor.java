@@ -17,6 +17,7 @@ public class Monitor {
     private boolean isFelled=false;
     private Date fireTime;
     private Date fellTime;
+    private String searchTime;
     public Monitor(String forest_id,  double latitude,double longitude, boolean forest_status) {
         this.forest_id = forest_id;
         this.longitude = longitude;
@@ -108,6 +109,15 @@ public class Monitor {
 
     public Monitor setFireTime(Date fireTime) {
         this.fireTime = fireTime;
+        return this;
+    }
+
+    public String getSearchTime() {
+        return searchTime;
+    }
+
+    public Monitor setSearchTime(String searchTime) {
+        this.searchTime = searchTime;
         return this;
     }
 }
