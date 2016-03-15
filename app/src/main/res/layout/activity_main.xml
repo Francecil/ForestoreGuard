@@ -1,0 +1,117 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.france.forestoreguard.ui.activity.MainActivity">
+
+    <com.baidu.mapapi.map.MapView
+        android:id="@+id/bmapView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:clickable="true" />
+    <Button
+        android:id="@+id/map_other2index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/map_other2index"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:onClick="onTabSelect"
+        android:visibility="gone"
+        />
+    <com.france.forestoreguard.ui.customView.ZoomControlView
+        android:id="@+id/zoomControlView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/map_bottom_linearLayout"
+        android:layout_marginBottom="40dp"
+        android:layout_marginRight="25.0dip"/>
+
+    <LinearLayout
+        android:id="@+id/map_bottom_linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="7dp"
+        android:layout_marginLeft="7dp"
+        android:layout_marginRight="7dp"
+       >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true">
+
+            <Button
+                android:id="@+id/map_button_fire"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/tab_fire_btn"
+                android:onClick="onTabSelect"
+                 />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true">
+
+            <Button
+                android:id="@+id/map_button_fell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/tab_fell_btn"
+                android:onClick="onTabSelect"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true">
+
+            <Button
+                android:id="@+id/map_button_navi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/tab_navi_btn"
+                android:onClick="onTabSelect"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true">
+
+            <Button
+                android:id="@+id/map_button_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/tab_video_btn"
+                android:onClick="onTabSelect" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</RelativeLayout>
