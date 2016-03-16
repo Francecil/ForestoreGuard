@@ -1,6 +1,7 @@
 package com.france.forestoreguard.ui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
@@ -62,5 +63,11 @@ public class BaseActivity extends FragmentActivity {
     public void ShowLog(String msg){
         Log.i("zjx", msg);
     }
+    public void startAnimActivity(Class<?> cla) {
+        this.startActivity(new Intent(this, cla));
+    }
 
+    public void startAnimActivity(Intent intent) {
+        this.startActivity(intent);
+    }
 }

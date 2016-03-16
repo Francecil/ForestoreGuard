@@ -510,11 +510,6 @@ public class MainActivity extends BaseActivity {
     }
 
     public void onTabSelect(View view) {
-        clearIndexDetailMarkers();
-        clearFireDetailMarkers();
-        clearFellDetailMarkers();
-        clearNaviDetailMarkers();
-        mBaiduMap.hideInfoWindow();
         switch (view.getId()) {
             case R.id.map_button_fire:
                 index = 0;
@@ -526,14 +521,19 @@ public class MainActivity extends BaseActivity {
                 index = 2;
                 break;
             case R.id.map_button_video:
-                index = 3;
-                break;
+                startAnimActivity(VideoActivity.class);
+                return;
             case R.id.map_other2index:
                 index = -1;
                 break;
             default:
                 break;
         }
+        clearIndexDetailMarkers();
+        clearFireDetailMarkers();
+        clearFellDetailMarkers();
+        clearNaviDetailMarkers();
+        mBaiduMap.hideInfoWindow();
         if (currentTabIndex != -1) {
             buttonTab[currentTabIndex].setSelected(false);
         }
