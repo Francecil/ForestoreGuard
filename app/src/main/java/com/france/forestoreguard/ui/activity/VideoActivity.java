@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.france.forestoreguard.R;
 import com.france.forestoreguard.adapter.VideoAdapter;
@@ -41,6 +42,7 @@ public class VideoActivity extends BaseActivity {
     // 定义播放声音的MediaPlayer
     private MyPlayer mPlayer;
     private SeekBar musicProgress;
+    private TextView leafTime;
     // 定义系统的示波器
     private Visualizer mVisualizer;
     // 创建MyVisualizerView组件，用于显示波形图
@@ -70,12 +72,16 @@ public class VideoActivity extends BaseActivity {
         playThread.start();
     }
     private void clearPlayer(){
+        if(musicProgress!=null){
+            musicProgress.setProgress(0);
+            musicProgress.setSecondaryProgress(0);
+        }
+        //后置player null
         if (mPlayer != null) {
             mPlayer.stop();
             mPlayer = null;
         }
         clearThread();
-        musicProgress.setProgress(0);
     }
     private void clearThread(){
         if(playThread!=null){
@@ -89,7 +95,8 @@ public class VideoActivity extends BaseActivity {
         videoListView=(ListView)findViewById(R.id.videoListView);
         waveLayout=(RelativeLayout)findViewById(R.id.waveLayout);
         musicProgress = (SeekBar) findViewById(R.id.music_progress);
-        mPlayer = new MyPlayer(musicProgress);
+        leafTime =(TextView)findViewById(R.id.leafTime);
+        mPlayer = new MyPlayer(musicProgress,leafTime);
         mVisualizerView =new MyVisualizerView(this);
     }
     private void initList(){
@@ -155,13 +162,12 @@ public class VideoActivity extends BaseActivity {
         public void onProgressChanged(SeekBar seekBar, int progress,
                                       boolean fromUser) {
             // 原本是(progress/seekBar.getMax())*player.mediaPlayer.getDuration()
-            this.progress = progress * mPlayer.mediaPlayer.getDuration()
-                    / seekBar.getMax();
+            this.progress = progress * mPlayer.mediaPlayer.getDuration() / seekBar.getMax();
         }
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-
+            ShowLog("onStartTrackingTouch");
         }
 
         @Override
@@ -179,10 +185,11 @@ public class VideoActivity extends BaseActivity {
     }
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         clearPlayer();
         mVisualizer.release();
         //注意销毁顺序
-        super.onDestroy();
+
     }
     @Override
     protected void onPause()

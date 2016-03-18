@@ -64,7 +64,7 @@
                 android:src="@drawable/login_twitter" />
 
             <ImageView
-                android:id="@+id/imageButton1"
+                android:id="@+id/login_btn"
                 android:layout_width="85dp"
                 android:layout_height="48dp"
                 android:layout_below="@+id/linearLayout2"

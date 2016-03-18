@@ -119,10 +119,11 @@
                                     android:layout_weight="1">
 
                                     <TextView
+                                        android:id="@+id/leafTime"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_centerInParent="true"
-                                        android:text="03:30"
+                                        android:text="00:00"
                                         android:textSize="13sp" />
                                 </RelativeLayout>
                             </LinearLayout>

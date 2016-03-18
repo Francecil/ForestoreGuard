@@ -4,7 +4,9 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -17,11 +19,13 @@ public class MyPlayer implements MediaPlayer.OnBufferingUpdateListener, MediaPla
         MediaPlayer.OnPreparedListener {
     public MediaPlayer mediaPlayer; // 媒体播放器
     private SeekBar seekBar; // 拖动条
+    private TextView leafTime;
     private Timer mTimer = new Timer(); // 计时器
     // 初始化播放器
-    public MyPlayer(SeekBar seekBar) {
+    public MyPlayer(SeekBar seekBar,TextView leafTime) {
         super();
         this.seekBar = seekBar;
+        this.leafTime = leafTime;
         try {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);// 设置媒体流类型
@@ -45,13 +49,24 @@ public class MyPlayer implements MediaPlayer.OnBufferingUpdateListener, MediaPla
             }
         }
     };
+    /*
+    getCurrentPosition:获取当前播放到的位置 单位ms
+    getDuration:获取总时长
+    seekBar.getMax() * position / duration; getMax=100 故取值在0-100之间
+     */
     Handler handler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             int position = mediaPlayer.getCurrentPosition();
             int duration = mediaPlayer.getDuration();
+            int leaf=(duration-position)/1000;
+            int min=leaf/60;String smin=min<10?"0"+min:""+min;
+            int sec=leaf%60;String ssec=sec<10?"0"+sec:""+sec;
+            leafTime.setText(smin+":"+ssec);
+//            Log.i("zjx","time:"+duration+" & position:"+position);
             if (duration > 0) {
                 // 计算进度（获取进度条最大刻度*当前音乐播放位置 / 当前音乐时长）
                 long pos = seekBar.getMax() * position / duration;
+//                Log.i("zjx","pos:"+pos);
                 seekBar.setProgress((int) pos);
             }
         };
@@ -116,11 +131,13 @@ public class MyPlayer implements MediaPlayer.OnBufferingUpdateListener, MediaPla
     /**
      * 缓冲更新，具体细节和技术需要研究
      * update:利用OnBufferingUpdateListener实现
+     * 默认缓冲完 进度条消失的bug
      */
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         seekBar.setSecondaryProgress(percent);
-        int currentProgress = seekBar.getMax() * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration();
-        Log.e(currentProgress + "% play", percent + " buffer");
+//        if(percent==100)seekBar.setSecondaryProgress(99);
+//        int currentProgress = seekBar.getMax() * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration();
+//        Log.e(currentProgress + "% play", percent + " buffer");
     }
 }

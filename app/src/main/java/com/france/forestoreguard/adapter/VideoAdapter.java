@@ -1,10 +1,15 @@
 package com.france.forestoreguard.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.france.forestoreguard.R;
@@ -36,20 +41,29 @@ public class VideoAdapter extends BaseAdapter {
     }
     static class ViewHolder{
         TextView  videoTime;
+        RelativeLayout layout_download;
     }
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder viewHolder;
-        Video video=videoList.get(i);
+        final ViewHolder viewHolder;
+        final Video video=videoList.get(i);
         if(view==null){
             view=inflater.inflate(R.layout.view_item_video,viewGroup,false);
             viewHolder=new ViewHolder();
             //find hold
             viewHolder.videoTime=(TextView)view.findViewById(R.id.video_time);
+            viewHolder.layout_download=(RelativeLayout)view.findViewById(R.id.layout_download);
+            viewHolder.layout_download.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i("zjx","cllllllllllll:"+view.getTag());
+                }
+            });
             view.setTag(viewHolder);
         }else{
             viewHolder=(ViewHolder)view.getTag();
         }
+        viewHolder.layout_download.setTag(i);
         viewHolder.videoTime.setText(video.getVoiceTime());
         return view;
     }

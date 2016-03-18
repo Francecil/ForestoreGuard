@@ -1,39 +1,73 @@
 package com.france.forestoreguard.ui.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.france.forestoreguard.R;
+import com.france.forestoreguard.ui.BaseActivity;
 
-public class LoginActivity extends AppCompatActivity {
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+import net.tsz.afinal.http.AjaxParams;
 
+
+public class LoginActivity extends BaseActivity {
+    ImageView login_btn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        login_btn=(ImageView)findViewById(R.id.login_btn);
+        login_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startAnimActivity(MainActivity.class);
+            }
+        });
+//        MThread mThread=new MThread();
+//        mThread.run();
     }
+    //连接定位接口并得到json
+    public void GetJSONString() throws Exception {
+        AjaxParams params = new AjaxParams();
+        params.put("user_name", "Amy");
+        params.put("user_psw", "950601");
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login, menu);
-        return true;
+        FinalHttp fh = new FinalHttp();
+        fh.post("http://120.24.251.94/3w/jalan/forestore/module/user/login/login.php", params, new AjaxCallBack() {
+            @Override
+            public void onLoading(long count, long current) {
+            }
+
+
+            @Override
+            public void onStart() {
+                super.onStart();
+            }
+
+            @Override
+            public void onSuccess(Object o) {
+                super.onSuccess(o);
+                ShowLog(o.toString());
+            }
+
+            @Override
+            public void onFailure(Throwable t, int errorNo, String strMsg) {
+                super.onFailure(t, errorNo, strMsg);
+            }
+        });
     }
+    class MThread implements Runnable{
+        @Override
+        public void run() {
+            try {
+                GetJSONString();
+            }catch (Exception e){
+                Log.e("zjx",e.getStackTrace()+"");
+            }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }
