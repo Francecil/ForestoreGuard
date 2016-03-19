@@ -65,9 +65,10 @@ public class MyPlayer implements MediaPlayer.OnBufferingUpdateListener, MediaPla
 //            Log.i("zjx","time:"+duration+" & position:"+position);
             if (duration > 0) {
                 // 计算进度（获取进度条最大刻度*当前音乐播放位置 / 当前音乐时长）
-                long pos = seekBar.getMax() * position / duration;
-//                Log.i("zjx","pos:"+pos);
-                seekBar.setProgress((int) pos);
+//                long pos = seekBar.getMax() * position / duration;
+////                Log.i("zjx","pos:"+pos);
+//                seekBar.setProgress((int) pos);
+                seekBar.setProgress(position/1000);//当前播放位置 (S)
             }
         };
     };
@@ -90,6 +91,7 @@ public class MyPlayer implements MediaPlayer.OnBufferingUpdateListener, MediaPla
             mediaPlayer.reset();
             mediaPlayer.setDataSource(url); // 设置数据源
             mediaPlayer.prepare(); // prepare自动播放
+            seekBar.setMax(mediaPlayer.getDuration() / 1000);//总长度的设置从100改为真正长度（S）
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -135,7 +137,9 @@ public class MyPlayer implements MediaPlayer.OnBufferingUpdateListener, MediaPla
      */
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
-        seekBar.setSecondaryProgress(percent);
+        //percent 0-100
+        seekBar.setSecondaryProgress(seekBar.getMax()*percent/100);
+        Log.e("zjx","buffer:"+percent);
 //        if(percent==100)seekBar.setSecondaryProgress(99);
 //        int currentProgress = seekBar.getMax() * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration();
 //        Log.e(currentProgress + "% play", percent + " buffer");

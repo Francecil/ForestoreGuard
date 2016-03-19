@@ -161,8 +161,9 @@ public class VideoActivity extends BaseActivity {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress,
                                       boolean fromUser) {
-            // 原本是(progress/seekBar.getMax())*player.mediaPlayer.getDuration()
-            this.progress = progress * mPlayer.mediaPlayer.getDuration() / seekBar.getMax();
+            //progress[0~100]
+//            this.progress = progress * mPlayer.mediaPlayer.getDuration() / seekBar.getMax();//得到的是音乐的时长位置 单位(ms)
+            this.progress = seekBar.getMax()*progress/100;
         }
 
         @Override
