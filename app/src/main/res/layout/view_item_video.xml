@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:descendantFocusability="blocksDescendants"
     android:layout_width="match_parent" android:layout_height="50dp">
     <!--beforeDescendants：viewgroup会优先其子类控件而获取到焦点-->
@@ -9,55 +9,68 @@
     <!--用focus的解决方法不好 ，这里不说了-->
     <!--发现最后都采用第三种，并且子类控件设置的大点比较好按到-->
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:layout_weight="5"
-        >
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent">
-            <TextView
-                android:id="@+id/video_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2016.08.11"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="16dp"
-                android:textSize="14sp"
-                />
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/temp_linear"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_weight="1"
+            android:layout_weight="5"
             >
-            <ImageView
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent">
+                <TextView
+                    android:id="@+id/video_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2016.08.11"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:textSize="14sp"
+                    />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                >
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/video_icon_play_s"
+                    />
+
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="4"
+                ></RelativeLayout>
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_marginRight="10dp"
+            android:id="@+id/layout_download"
+            android:layout_weight="1.5">
+            <ImageButton
+                android:id="@+id/downloadBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:background="@drawable/video_icon_play_s"
-                 />
-
+                android:clickable="false"
+                android:src="@drawable/btn_download"
+                />
         </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="4"
-            ></RelativeLayout>
     </LinearLayout>
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="fill_parent"
-        android:layout_marginRight="10dp"
-        android:id="@+id/layout_download"
-        android:layout_weight="1.5">
-        <ImageButton
-            android:id="@+id/downloadBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:clickable="false"
-            android:src="@drawable/btn_download"
-            />
-    </RelativeLayout>
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_alignBottom="@+id/temp_linear"
+        android:progress="0"
+        android:visibility="invisible"
+        android:layout_height="4dp" />
+</RelativeLayout>

@@ -6,8 +6,6 @@ package com.france.forestoreguard.model;
 public class Video {
     private String forestID;
     private String voiceUrl;
-    //sd卡路径
-    private String voiceSD;
     //录音时间
     private String voiceTime;
 
@@ -33,13 +31,6 @@ public class Video {
         this.voiceUrl = voiceUrl;
     }
 
-    public String getVoiceSD() {
-        return voiceSD;
-    }
-
-    public void setVoiceSD(String voiceSD) {
-        this.voiceSD = voiceSD;
-    }
 
     public String getVoiceTime() {
         return voiceTime;
