@@ -59,6 +59,7 @@ public class VideoAdapter extends BaseAdapter {
         ProgressBar progressBar;
         DownloadTask task;//每个view都可能带有一个Task
     }
+
     @Override
     public View getView(final int i, View view, ViewGroup viewGroup) {
         final ViewHolder viewHolder;
@@ -87,13 +88,18 @@ public class VideoAdapter extends BaseAdapter {
                     url=url.substring(0,url.lastIndexOf('/')+1)+fileName;
                     if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                         File savDir = Environment.getExternalStorageDirectory();
-                        File saveDir=new File(savDir.getPath());
+                        File saveDir=new File(savDir.getPath()+File.separator+"forestoreGuard");
 //                        download(url, savDir,viewHolder.progressBar);
-                        viewHolder.task = new DownloadTask(url, saveDir,i);
-                        viewHolder.progressBar.setVisibility(View.VISIBLE);
-                        viewHolder.progressBar.setProgress(0);
-                        new Thread(viewHolder.task).start();
-                        Log.i("zjx","fileName:"+fileName+" &url="+url+" &savDir:"+savDir);
+                        //先去文件夹下找有没有存在文件
+                        if(existFile(saveDir,fileName)){
+                            Toast.makeText(ct,R.string.download_already,Toast.LENGTH_SHORT).show();
+                        }else {
+                            viewHolder.task = new DownloadTask(url, saveDir, i);
+                            viewHolder.progressBar.setVisibility(View.VISIBLE);
+                            viewHolder.progressBar.setProgress(0);
+                            new Thread(viewHolder.task).start();
+                            Log.i("zjx", "fileName:" + fileName + " &url=" + url + " &savDir:" + savDir);
+                        }
                     } else {
                         Log.i("zjx","无sd卡");
                     }
@@ -107,6 +113,12 @@ public class VideoAdapter extends BaseAdapter {
         viewHolder.videoTime.setText(video.getVoiceTime());
         return view;
     }
+    private boolean existFile(File saveDir,String filename){
+        if(!saveDir.exists())return false;
+        File file=new File(saveDir.getPath()+File.separator+filename);
+        if(!file.exists())return false;
+        return true;
+    }
     private Handler handler = new UIHandler();
 
     private final class UIHandler extends Handler {
@@ -116,11 +128,11 @@ public class VideoAdapter extends BaseAdapter {
                     ProgressBar progressBar=progressBarList.get(msg.getData().getInt("index"));
                     progressBar.setProgress(msg.getData().getInt("size"));
                     if (progressBar.getProgress() == progressBar.getMax()) { // 下载完成
-                        Toast.makeText(ct,R.string.download_success,Toast.LENGTH_SHORT);
+                        Toast.makeText(ct,R.string.download_success,Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.INVISIBLE);
                     }
                     break;
-                case FAILURE:Toast.makeText(ct,R.string.download_fail,Toast.LENGTH_SHORT);break;
+                case FAILURE:Toast.makeText(ct,R.string.download_fail,Toast.LENGTH_SHORT).show();break;
             }
         }
     }

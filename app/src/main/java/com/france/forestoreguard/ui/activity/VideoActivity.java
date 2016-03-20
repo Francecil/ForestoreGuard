@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.audiofx.Visualizer;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +33,9 @@ import com.france.forestoreguard.ui.BaseActivity;
 import com.france.forestoreguard.ui.customView.MyVisualizerView;
 import com.france.forestoreguard.util.MyPlayer;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,9 +126,29 @@ public class VideoActivity extends BaseActivity {
                 ShowLog("你点击了ListView条目" + index);//在LogCat中输出信息
                 ShowLog("VideoID:" + ((Video) videoListView.getItemAtPosition(index)).getForestID());
                 clearThread();
-                startOnlinePlay(((Video)videoListView.getItemAtPosition(index)).getVoiceUrl());
+                if (!existFile((Video) videoListView.getItemAtPosition(index)))
+                    startOnlinePlay(((Video) videoListView.getItemAtPosition(index)).getVoiceUrl());
             }
         });
+    }
+    private boolean existFile(Video video){
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {ShowLog("sd卡无");return false;}
+        File savDir = Environment.getExternalStorageDirectory();
+        File saveDir=new File(savDir.getPath()+File.separator+"forestoreGuard");
+        if(!saveDir.exists()){ShowLog("forestoreGuard无");return false;}
+        String url=video.getVoiceUrl();
+        String fileName=url.substring(url.lastIndexOf('/') + 1);
+        try {
+            // URL编码（这里是为了将中文进行URL编码）不整个url都编码是防止'/ .'也被编码
+            fileName = URLEncoder.encode(fileName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        File file=new File(saveDir.getPath()+File.separator+fileName);
+        ShowLog("file path:"+file.getAbsolutePath());
+        if(!file.exists()){ShowLog("file 无");return false;}
+        startOnlinePlay(file.getAbsolutePath());
+        return true;
     }
     //示波器的显示
     private void setupVisualizer()

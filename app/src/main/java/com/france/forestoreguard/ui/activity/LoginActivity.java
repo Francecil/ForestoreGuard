@@ -24,6 +24,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 startAnimActivity(MainActivity.class);
+                LoginActivity.this.finish();
             }
         });
 //        MThread mThread=new MThread();
