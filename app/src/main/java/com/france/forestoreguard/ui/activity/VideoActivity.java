@@ -2,6 +2,7 @@ package com.france.forestoreguard.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -33,6 +34,14 @@ import com.france.forestoreguard.ui.BaseActivity;
 import com.france.forestoreguard.ui.customView.MyVisualizerView;
 import com.france.forestoreguard.util.MyPlayer;
 
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+import net.tsz.afinal.http.AjaxParams;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -51,23 +60,27 @@ public class VideoActivity extends BaseActivity {
     private Visualizer mVisualizer;
     // 创建MyVisualizerView组件，用于显示波形图
     private MyVisualizerView mVisualizerView;
-    private ImageView playButton,stopButton;
+    private ImageView playButton, stopButton;
     RelativeLayout waveLayout;
     Thread playThread;
+    private SharedPreferences tokenSharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tokenSharedPreferences=this.getSharedPreferences("token",MODE_PRIVATE);
         // 设置控制音乐声音
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setContentView(R.layout.activity_video);
         initUI();
         initList();
-        initListener();
+//        initListener();
         // 初始化示波器
         setupVisualizer();
     }
-    private void startOnlinePlay(final String url){
-        playThread=new Thread(new Runnable() {
+
+    private void startOnlinePlay(final String url) {
+        playThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 mPlayer.playUrl(url);
@@ -75,8 +88,9 @@ public class VideoActivity extends BaseActivity {
         });
         playThread.start();
     }
-    private void clearPlayer(){
-        if(musicProgress!=null){
+
+    private void clearPlayer() {
+        if (musicProgress != null) {
             musicProgress.setProgress(0);
             musicProgress.setSecondaryProgress(0);
         }
@@ -87,38 +101,45 @@ public class VideoActivity extends BaseActivity {
         }
         clearThread();
     }
-    private void clearThread(){
-        if(playThread!=null){
+
+    private void clearThread() {
+        if (playThread != null) {
             playThread.interrupt();
-            playThread=null;
+            playThread = null;
         }
     }
-    private void initUI(){
-        playButton=(ImageView)findViewById(R.id.playButton);
-        stopButton=(ImageView)findViewById(R.id.stopButton);
-        videoListView=(ListView)findViewById(R.id.videoListView);
-        waveLayout=(RelativeLayout)findViewById(R.id.waveLayout);
+
+    private void initUI() {
+        playButton = (ImageView) findViewById(R.id.playButton);
+        stopButton = (ImageView) findViewById(R.id.stopButton);
+        videoListView = (ListView) findViewById(R.id.videoListView);
+        waveLayout = (RelativeLayout) findViewById(R.id.waveLayout);
         musicProgress = (SeekBar) findViewById(R.id.music_progress);
-        leafTime =(TextView)findViewById(R.id.leafTime);
-        mPlayer = new MyPlayer(musicProgress,leafTime);
-        mVisualizerView =new MyVisualizerView(this);
+        leafTime = (TextView) findViewById(R.id.leafTime);
+        mPlayer = new MyPlayer(musicProgress, leafTime);
+        mVisualizerView = new MyVisualizerView(this);
     }
-    private void initList(){
+
+    private void initList() {
         videoList=new ArrayList<>();
-        videoList.add(new Video("aaa","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.01.01"));
-        videoList.add(new Video("bbb","http://abv.cn/music/光辉岁月.mp3","2016.02.02"));
-        videoList.add(new Video("ccc","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.03.03"));
-        videoList.add(new Video("ddd","http://abv.cn/music/光辉岁月.mp3","2016.04.04"));
-        videoList.add(new Video("bbb","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.02.02"));
-        videoList.add(new Video("ccc","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.03.03"));
-        videoList.add(new Video("ddd","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.04.04"));
-        videoList.add(new Video("bbb","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.02.02"));
-        videoList.add(new Video("ccc","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.03.03"));
-        videoList.add(new Video("ddd","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.04.04"));
-        videoAdapter=new VideoAdapter(VideoActivity.this,videoList);
-        videoListView.setAdapter(videoAdapter);
+        GetVideoThread thread = new GetVideoThread();
+        thread.run();
+//        videoList=new ArrayList<>();
+//        videoList.add(new Video("aaa","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.01.01"));
+//        videoList.add(new Video("bbb","http://abv.cn/music/光辉岁月.mp3","2016.02.02"));
+//        videoList.add(new Video("ccc","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.03.03"));
+//        videoList.add(new Video("ddd","http://abv.cn/music/光辉岁月.mp3","2016.04.04"));
+//        videoList.add(new Video("bbb","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.02.02"));
+//        videoList.add(new Video("ccc","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.03.03"));
+//        videoList.add(new Video("ddd","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.04.04"));
+//        videoList.add(new Video("bbb","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.02.02"));
+//        videoList.add(new Video("ccc","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.03.03"));
+//        videoList.add(new Video("ddd","http://120.24.251.94/3w/jalan/forestStore/resource/voice/dbz.mp3","2016.04.04"));
+//        videoAdapter=new VideoAdapter(VideoActivity.this,videoList);
+//        videoListView.setAdapter(videoAdapter);
     }
-    private void initListener(){
+
+    private void initListener() {
         musicProgress.setOnSeekBarChangeListener(new SeekBarChangeEvent());
         videoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -131,30 +152,40 @@ public class VideoActivity extends BaseActivity {
             }
         });
     }
-    private boolean existFile(Video video){
-        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {ShowLog("sd卡无");return false;}
+
+    private boolean existFile(Video video) {
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            ShowLog("sd卡无");
+            return false;
+        }
         File savDir = Environment.getExternalStorageDirectory();
-        File saveDir=new File(savDir.getPath()+File.separator+"forestoreGuard");
-        if(!saveDir.exists()){ShowLog("forestoreGuard无");return false;}
-        String url=video.getVoiceUrl();
-        String fileName=url.substring(url.lastIndexOf('/') + 1);
+        File saveDir = new File(savDir.getPath() + File.separator + "forestoreGuard");
+        if (!saveDir.exists()) {
+            ShowLog("forestoreGuard无");
+            return false;
+        }
+        String url = video.getVoiceUrl();
+        String fileName = url.substring(url.lastIndexOf('/') + 1);
         try {
             // URL编码（这里是为了将中文进行URL编码）不整个url都编码是防止'/ .'也被编码
             fileName = URLEncoder.encode(fileName, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        File file=new File(saveDir.getPath()+File.separator+fileName);
-        ShowLog("file path:"+file.getAbsolutePath());
-        if(!file.exists()){ShowLog("file 无");return false;}
+        File file = new File(saveDir.getPath() + File.separator + fileName);
+        ShowLog("file path:" + file.getAbsolutePath());
+        if (!file.exists()) {
+            ShowLog("file 无");
+            return false;
+        }
         startOnlinePlay(file.getAbsolutePath());
         return true;
     }
-    //示波器的显示
-    private void setupVisualizer()
-    {
 
-        mVisualizerView.setLayoutParams(new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
+    //示波器的显示
+    private void setupVisualizer() {
+
+        mVisualizerView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         // 将MyVisualizerView组件添加到layout容器中
         waveLayout.addView(mVisualizerView);
         // 以MediaPlayer的AudioSessionId创建Visualizer
@@ -179,6 +210,7 @@ public class VideoActivity extends BaseActivity {
                 }, Visualizer.getMaxCaptureRate() / 2, true, false);
         mVisualizer.setEnabled(true);
     }
+
     class SeekBarChangeEvent implements SeekBar.OnSeekBarChangeListener {
         int progress;
 
@@ -187,7 +219,7 @@ public class VideoActivity extends BaseActivity {
                                       boolean fromUser) {
             //progress[0~100]
 //            this.progress = progress * mPlayer.mediaPlayer.getDuration() / seekBar.getMax();//得到的是音乐的时长位置 单位(ms)
-            this.progress = seekBar.getMax()*progress/100;
+            this.progress = seekBar.getMax() * progress / 100;
         }
 
         @Override
@@ -202,12 +234,18 @@ public class VideoActivity extends BaseActivity {
         }
 
     }
-    public void onVideoStatusChange(View view){
-        switch (view.getId()){
-            case R.id.playButton:mPlayer.rePlay();break;
-            case R.id.stopButton:mPlayer.pause();break;
+
+    public void onVideoStatusChange(View view) {
+        switch (view.getId()) {
+            case R.id.playButton:
+                mPlayer.rePlay();
+                break;
+            case R.id.stopButton:
+                mPlayer.pause();
+                break;
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -216,9 +254,61 @@ public class VideoActivity extends BaseActivity {
         //注意销毁顺序
 
     }
+
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
+    }
+
+    class GetVideoThread implements Runnable {
+        @Override
+        public void run() {
+            String token = tokenSharedPreferences.getString("token", "");
+            AjaxParams params = new AjaxParams();
+            params.put("guard_token", token);
+
+            FinalHttp fh = new FinalHttp();
+            fh.post("http://120.24.251.94/3w/jalan/forestore/module/guard/forest/forestVoice.php", params, new AjaxCallBack() {
+                        @Override
+                        public void onLoading(long count, long current) {
+                        }
+
+
+                        @Override
+                        public void onStart() {
+                            super.onStart();
+                        }
+
+                        @Override
+                        public void onSuccess(Object o) {
+                            super.onSuccess(o);
+                            ShowLog(o.toString());
+                            try {
+                                JSONObject jsonObject = new JSONObject(o.toString());
+                                JSONObject dataObject = jsonObject.getJSONObject("data");
+                                JSONArray voiceArray = dataObject.getJSONArray("voice_arr");
+                                for (int i = 0; i < voiceArray.length(); i++) {
+                                    JSONObject voiceObject = voiceArray.getJSONObject(i);
+                                    ShowLog(voiceObject.getString("voice_url"));
+                                    videoList.add(new Video(voiceObject.getString("forest_id"), "http://"+voiceObject.getString("voice_url"), voiceObject.getString("time")));
+//                                    monitors.add(new Monitor())
+                                }
+                                videoAdapter = new VideoAdapter(VideoActivity.this, videoList);
+                                videoListView.setAdapter(videoAdapter);
+                                initListener();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t, int errorNo, String strMsg) {
+                            super.onFailure(t, errorNo, strMsg);
+                        }
+                    }
+
+            );
+        }
     }
 }

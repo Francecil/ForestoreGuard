@@ -1,5 +1,6 @@
 package com.france.forestoreguard.ui.activity;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +36,14 @@ import com.france.forestoreguard.model.Monitor;
 import com.france.forestoreguard.ui.BaseActivity;
 import com.france.forestoreguard.ui.customView.ZoomControlView;
 
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+import net.tsz.afinal.http.AjaxParams;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,10 +75,11 @@ public class MainActivity extends BaseActivity {
     HashMap<String, Marker> indexDetailOptions = new HashMap<String, Marker>();
     HashMap<String, Marker> fireDetailOptions = new HashMap<String, Marker>();
     HashMap<String, Marker> fellDetailOptions = new HashMap<String, Marker>();
-    HashMap<String,Marker> naviDetailOptions=new HashMap<>();
+    HashMap<String, Marker> naviDetailOptions = new HashMap<>();
     HashMap<String, List<Marker>> indexMarkers = new HashMap<>();
     HashMap<String, List<Marker>> fireMarkers = new HashMap<>();
     HashMap<String, List<Marker>> fellMarkers = new HashMap<>();
+    private SharedPreferences tokenSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +208,7 @@ public class MainActivity extends BaseActivity {
     private void showNavi() {
         Iterator iterator = monitors.iterator();
         int monitorIndex = 0;
-        boolean hasMarker=naviDetailOptions!=null&&naviDetailOptions.size()>0;
+        boolean hasMarker = naviDetailOptions != null && naviDetailOptions.size() > 0;
         while (iterator.hasNext()) {
             Monitor monitor = (Monitor) iterator.next();
             if (monitor.isFelled()) {
@@ -224,7 +234,7 @@ public class MainActivity extends BaseActivity {
                     markers2.add((Marker) mBaiduMap.addOverlay(new MonitorMarkerOptions().position(monitor.getLatLng()).zIndex(19).icon(map_fell_circle).anchor(0.5f, 0.5f).setMonitor(monitor).extraInfo(bundle)));
                     fellMarkers.put(monitor.getForest_id(), markers2);
                 }
-            } else if (monitor.isFired()){
+            } else if (monitor.isFired()) {
                 List<Marker> markers0 = indexMarkers.get(monitor.getForest_id());
                 markers0.get(0).setVisible(false);
                 markers0.get(1).setVisible(false);
@@ -247,23 +257,23 @@ public class MainActivity extends BaseActivity {
                     markers2.add((Marker) mBaiduMap.addOverlay(new MonitorMarkerOptions().position(monitor.getLatLng()).zIndex(19).icon(map_fire_circle).anchor(0.5f, 0.5f).setMonitor(monitor).extraInfo(bundle)));
                     fireMarkers.put(monitor.getForest_id(), markers2);
                 }
-            }else{
+            } else {
                 List<Marker> markers0 = indexMarkers.get(monitor.getForest_id());
                 markers0.get(0).setVisible(true);
                 markers0.get(1).setVisible(true);
             }
             //设置巡察时间;
-            if(!hasMarker) {
+            if (!hasMarker) {
                 Bundle bundle = new Bundle();
                 bundle.putInt(MonitorConfig.MONITOR_ID, monitorIndex);
                 bundle.putString(MonitorConfig.MONITOR_INFO, MonitorConfig.MONITOR_NAVI);
                 View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_marker_monitor_navitime, null);
-                TextView textView=(TextView)view.findViewById(R.id.time_search);
+                TextView textView = (TextView) view.findViewById(R.id.time_search);
                 textView.setText(monitor.getSearchTime());
                 BitmapDescriptor markerIcon = BitmapDescriptorFactory.fromBitmap(getViewBitmap(view));
                 naviDetailOptions.put(monitor.getForest_id(), (Marker) mBaiduMap.addOverlay(new MonitorMarkerOptions().position(monitor.getLatLng()).zIndex(19).icon(markerIcon).anchor(0.5f, 0f).setMonitor(monitor).extraInfo(bundle)));
             }
-            Marker marker=naviDetailOptions.get(monitor.getForest_id());
+            Marker marker = naviDetailOptions.get(monitor.getForest_id());
             marker.setVisible(true);
             marker.setToTop();
             monitorIndex++;
@@ -299,7 +309,8 @@ public class MainActivity extends BaseActivity {
             marker.setVisible(false);
         }
     }
-    private void clearNaviDetailMarkers(){
+
+    private void clearNaviDetailMarkers() {
         Iterator iterator = naviDetailOptions.entrySet().iterator();
         while (iterator.hasNext()) {
             HashMap.Entry map = (HashMap.Entry) iterator.next();
@@ -307,6 +318,7 @@ public class MainActivity extends BaseActivity {
             marker.setVisible(false);
         }
     }
+
     //    private void clearIndex(){}
 //    private void clearFire(){}
 //    private void clearFell(){}
@@ -358,32 +370,32 @@ public class MainActivity extends BaseActivity {
                     //开启or关闭info
                     ShowLog("MONITOR_ID:" + bundle.getString(MonitorConfig.MONITOR_INFO));
                     switch (bundle.getString(MonitorConfig.MONITOR_INFO)) {
-                        case MonitorConfig.MONITOR_INDEX:{
-                            if(currentTabIndex!=-1)return false;
+                        case MonitorConfig.MONITOR_INDEX: {
+                            if (currentTabIndex != -1) return false;
                             generateMarker(monitor);
                             break;
                         }
                         case MonitorConfig.MONITOR_FIRE: {
-                            if(currentTabIndex!=0)return false;//可能是在fell页点击的时候 fire处于隐藏,重复了
+                            if (currentTabIndex != 0) return false;//可能是在fell页点击的时候 fire处于隐藏,重复了
                             View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_marker_monitor_time, null);
-                            TextView time_day=(TextView)view.findViewById(R.id.time_day);
-                            TextView time_second=(TextView)view.findViewById(R.id.time_second);
-                            SimpleDateFormat df=new SimpleDateFormat("yyyy/MM/dd");
+                            TextView time_day = (TextView) view.findViewById(R.id.time_day);
+                            TextView time_second = (TextView) view.findViewById(R.id.time_second);
+                            SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
                             time_day.setText(df.format(monitor.getFireTime()));
-                            SimpleDateFormat df2=new SimpleDateFormat("hh:mm:ss");
+                            SimpleDateFormat df2 = new SimpleDateFormat("hh:mm:ss");
                             time_second.setText(df2.format(monitor.getFireTime()));
                             InfoWindow infoWindownew = new InfoWindow(view, monitor.getLatLng(), 110);
                             mBaiduMap.showInfoWindow(infoWindownew);
                             break;
                         }
                         case MonitorConfig.MONITOR_FELL: {
-                            if(currentTabIndex!=1)return false;//可能是在fell页点击的时候 fire处于隐藏,重复了
+                            if (currentTabIndex != 1) return false;//可能是在fell页点击的时候 fire处于隐藏,重复了
                             View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_marker_monitor_time, null);
-                            TextView time_day=(TextView)view.findViewById(R.id.time_day);
-                            TextView time_second=(TextView)view.findViewById(R.id.time_second);
-                            SimpleDateFormat df=new SimpleDateFormat("yyyy/MM/dd");
+                            TextView time_day = (TextView) view.findViewById(R.id.time_day);
+                            TextView time_second = (TextView) view.findViewById(R.id.time_second);
+                            SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
                             time_day.setText(df.format(monitor.getFellTime()));
-                            SimpleDateFormat df2=new SimpleDateFormat("hh:mm:ss");
+                            SimpleDateFormat df2 = new SimpleDateFormat("hh:mm:ss");
                             time_second.setText(df2.format(monitor.getFellTime()));
                             InfoWindow infoWindownew = new InfoWindow(view, monitor.getLatLng(), 110);
                             mBaiduMap.showInfoWindow(infoWindownew);
@@ -437,6 +449,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initMonitors() {
+
+
         monitors.add(new Monitor("aaa", 26.067144, 119.209095, false, false, false).setmDeviceStatus(new DeviceStatus(false, true, true)).setSearchTime("13:20 ~ 14.20"));
         monitors.add(new Monitor("bbb", 26.047144, 119.189095, true, false, true).setmDeviceStatus(new DeviceStatus(true, true, true)).setFellTime(new Date("2010/04/04 04:04:04")).setSearchTime("14:50 ~ 15.20"));
         monitors.add(new Monitor("ccc", 26.047144, 119.209095, false, true, false).setmDeviceStatus(new DeviceStatus(false, false, true)).setFireTime(new Date("2010/01/01 01:01:01")).setSearchTime("16:20 ~ 17.20"));
@@ -509,13 +523,15 @@ public class MainActivity extends BaseActivity {
 
         return bitmap;
     }
-    public void cleadAllMarkers(){
+
+    public void cleadAllMarkers() {
         clearIndexDetailMarkers();
         clearFireDetailMarkers();
         clearFellDetailMarkers();
         clearNaviDetailMarkers();
         mBaiduMap.hideInfoWindow();
     }
+
     public void onTabSelect(View view) {
         switch (view.getId()) {
             case R.id.map_button_fire:
@@ -630,13 +646,15 @@ public class MainActivity extends BaseActivity {
         mMapView.onPause();
         super.onPause();
     }
+
     private boolean doubleBackToExitPressedOnce = false;
+
     @Override
     public void onBackPressed() {
-        if(currentTabIndex<=2&&currentTabIndex>=0){
+        if (currentTabIndex <= 2 && currentTabIndex >= 0) {
             buttonTab[currentTabIndex].setSelected(false);
             buttonTab[4].setVisibility(View.GONE);
-            currentTabIndex=index=-1;
+            currentTabIndex = index = -1;
             showIndex();
             return;
         }
@@ -654,5 +672,52 @@ public class MainActivity extends BaseActivity {
                 doubleBackToExitPressedOnce = false;
             }
         }, 2000);
+    }
+
+    class getMonitor implements Runnable {
+        @Override
+        public void run() {
+            String token = tokenSharedPreferences.getString("token", "");
+            AjaxParams params = new AjaxParams();
+            params.put("guard_token", token);
+
+            FinalHttp fh = new FinalHttp();
+            fh.post("http://120.24.251.94/3w/jalan/forestore/module/guard/forest/guardForest.php", params, new AjaxCallBack() {
+                        @Override
+                        public void onLoading(long count, long current) {
+                        }
+
+
+                        @Override
+                        public void onStart() {
+                            super.onStart();
+                        }
+
+                        @Override
+                        public void onSuccess(Object o) {
+                            super.onSuccess(o);
+                            ShowLog(o.toString());
+                            try {
+                                JSONObject jsonObject = new JSONObject(o.toString());
+                                JSONArray dataArray = jsonObject.getJSONArray("data");
+                                for(int i=0;i<dataArray.length();i++){
+                                    JSONObject forestore=dataArray.getJSONObject(i);
+//                                    monitors.add(new Monitor("aaa", 26.067144, 119.209095, false, false, false).setmDeviceStatus(new DeviceStatus(false, true, true)).setSearchTime("13:20 ~ 14.20"));
+//                                    monitors.add(new Monitor())
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t, int errorNo, String strMsg) {
+                            super.onFailure(t, errorNo, strMsg);
+                        }
+                    }
+
+            );
+        }
     }
 }
