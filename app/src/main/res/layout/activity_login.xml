@@ -1,111 +1,93 @@
 <?xml version="1.0"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/LinearLayout1"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="${relativePackage}.${activityClass}">
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:background="#FFFFFF"
         android:orientation="vertical">
 
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:orientation="vertical">
 
+            <EditText
+                android:id="@+id/loginname"
+                android:layout_width="300dp"
+                android:layout_height="35dp"
+                android:background="#87C728"
+                android:textSize="18sp"
+                android:paddingLeft="10dp"
+                android:hint="Name" />
 
-            <LinearLayout
-                android:id="@+id/linearLayout2"
+            <TextView
+                android:id="@+id/textView1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:orientation="vertical">
+                android:layout_height="wrap_content" />
 
-                <EditText
-                    android:id="@+id/loginname"
-                    android:layout_width="500px"
-                    android:layout_height="35dp"
-                    android:background="#87C728"
-                    android:hint="Name" />
+            <EditText
+                android:id="@+id/loginpwd"
+                android:paddingLeft="10dp"
+                android:layout_width="300dp"
+                android:layout_height="35dp"
+                android:background="#87C728"
+                android:textSize="18sp"
+                android:password="true"
+                android:hint="Password" />
 
-                <TextView
-                    android:id="@+id/textView1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+        </LinearLayout>
 
-                <EditText
-                    android:id="@+id/loginpwd"
-                    android:layout_width="500px"
-                    android:layout_height="35dp"
-                    android:background="#87C728"
-                    android:hint="Password" />
+        <ImageView
+            android:id="@+id/imageButton3"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignTop="@+id/imageButton2"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/login_twitter" />
 
-            </LinearLayout>
+        <ImageView
+            android:id="@+id/login_btn"
+            android:layout_width="85dp"
+            android:layout_height="48dp"
+            android:layout_below="@+id/linearLayout2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="25dp"
+            android:src="@drawable/login_button" />
 
-            <ImageView
-                android:id="@+id/imageButton3"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_alignTop="@+id/imageButton2"
-                android:layout_centerHorizontal="true"
-                android:src="@drawable/login_twitter" />
+        <ImageView
+            android:id="@+id/imageButton4"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignRight="@+id/linearLayout2"
+            android:layout_alignTop="@+id/imageButton3"
+            android:layout_marginRight="19dp"
+            android:src="@drawable/login_ins" />
 
-            <ImageView
-                android:id="@+id/login_btn"
-                android:layout_width="85dp"
-                android:layout_height="48dp"
-                android:layout_below="@+id/linearLayout2"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="25dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/login_button" />
+        <ImageView
+            android:id="@+id/imageButton2"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignLeft="@+id/linearLayout2"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="89dp"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/login_facebook" />
 
-            <ImageView
-                android:id="@+id/imageButton4"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_alignRight="@+id/linearLayout2"
-                android:layout_alignTop="@+id/imageButton3"
-                android:layout_marginRight="19dp"
-                android:src="@drawable/login_ins" />
+        <LinearLayout
+            android:id="@+id/linearLayout3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/linearLayout2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="50dp"
+            android:background="@drawable/login_sign"
+            android:orientation="vertical"></LinearLayout>
 
-            <ImageView
-                android:id="@+id/imageButton2"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_alignLeft="@+id/linearLayout2"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="89dp"
-                android:layout_marginLeft="20dp"
-                android:src="@drawable/login_facebook" />
-
-            <LinearLayout
-                android:id="@+id/linearLayout3"
-                android:layout_width="140dp"
-                android:layout_height="120dp"
-                android:layout_above="@+id/linearLayout2"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="50dp"
-                android:orientation="vertical"
-                android:background="@drawable/login_sign"
-                >
-            </LinearLayout>
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-</LinearLayout>
+    </RelativeLayout>

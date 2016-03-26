@@ -2,6 +2,7 @@ package com.france.forestoreguard.ui.activity;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -508,7 +509,13 @@ public class MainActivity extends BaseActivity {
 
         return bitmap;
     }
-
+    public void cleadAllMarkers(){
+        clearIndexDetailMarkers();
+        clearFireDetailMarkers();
+        clearFellDetailMarkers();
+        clearNaviDetailMarkers();
+        mBaiduMap.hideInfoWindow();
+    }
     public void onTabSelect(View view) {
         switch (view.getId()) {
             case R.id.map_button_fire:
@@ -529,11 +536,7 @@ public class MainActivity extends BaseActivity {
             default:
                 break;
         }
-        clearIndexDetailMarkers();
-        clearFireDetailMarkers();
-        clearFellDetailMarkers();
-        clearNaviDetailMarkers();
-        mBaiduMap.hideInfoWindow();
+        cleadAllMarkers();
         if (currentTabIndex != -1) {
             buttonTab[currentTabIndex].setSelected(false);
         }
@@ -626,5 +629,30 @@ public class MainActivity extends BaseActivity {
         //在activity执行onPause时执行mMapView. onPause ()，实现地图生命周期管理
         mMapView.onPause();
         super.onPause();
+    }
+    private boolean doubleBackToExitPressedOnce = false;
+    @Override
+    public void onBackPressed() {
+        if(currentTabIndex<=2&&currentTabIndex>=0){
+            buttonTab[currentTabIndex].setSelected(false);
+            buttonTab[4].setVisibility(View.GONE);
+            currentTabIndex=index=-1;
+            showIndex();
+            return;
+        }
+        if (doubleBackToExitPressedOnce) {//按两次
+            super.onBackPressed();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+//		Toast.makeText(this,R.string.doubleclick, Toast.LENGTH_SHORT).show();
+        ShowToast(R.string.doubleBackToExitPressedOnce);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
     }
 }

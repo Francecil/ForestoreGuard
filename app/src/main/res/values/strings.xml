@@ -9,4 +9,7 @@
     <string name="download_success">Download Success</string>
     <string name="download_fail">Download Failed</string>
     <string name="download_already">Have already downloaded the file</string>
+    <string name="doubleBackToExitPressedOnce">Double click exit program</string>
+    <string name="login_failed">Login failed,your username or password is wrong</string>
+    <string name="login_failed_net">Login failed</string>
 </resources>

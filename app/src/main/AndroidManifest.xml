@@ -42,7 +42,7 @@
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="PSQUobOe4RN0AMyBQTRNA59a" />
+            android:value="BE7dLCFlcz9qiXcswVVjNpTEz9utbZS9" />
 
         <activity
             android:name=".ui.activity.VideoActivity"
