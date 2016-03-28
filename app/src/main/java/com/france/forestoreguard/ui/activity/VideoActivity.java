@@ -290,7 +290,7 @@ public class VideoActivity extends BaseActivity {
                                 for (int i = 0; i < voiceArray.length(); i++) {
                                     JSONObject voiceObject = voiceArray.getJSONObject(i);
                                     ShowLog(voiceObject.getString("voice_url"));
-                                    videoList.add(new Video(voiceObject.getString("forest_id"), "http://"+voiceObject.getString("voice_url"), voiceObject.getString("time")));
+                                    videoList.add(new Video(voiceObject.getString("forest_id"), "http://"+voiceObject.getString("voice_url"), voiceObject.getString("time").substring(0,10)));
 //                                    monitors.add(new Monitor())
                                 }
                                 videoAdapter = new VideoAdapter(VideoActivity.this, videoList);

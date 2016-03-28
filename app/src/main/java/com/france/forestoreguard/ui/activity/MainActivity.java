@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -70,6 +71,7 @@ public class MainActivity extends BaseActivity {
     private ZoomControlView mZoomControlView;
     MapView mMapView;
     BaiduMap mBaiduMap;
+    Handler handler;
     boolean isFirstLoc = true; // 是否首次定位
     ArrayList<Monitor> monitors = new ArrayList<>();
     //    latitude: 26.057144, longitude: 119.199095
@@ -85,14 +87,26 @@ public class MainActivity extends BaseActivity {
     private String Title[]={
         "Forestore","Fire","Log","Advice"
     };
+    private String SearchTime[]={
+            "08:30 ~ 09:20","09:40 ~ 10:30","10:40 ~ 11:30","12:40 ~ 13:10","13:20 ~ 14:20","15:00 ~ 15:50"
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        tokenSharedPreferences=this.getSharedPreferences("token",MODE_PRIVATE);
         initUI();
         initMap();
         initClickListener();
         initMonitors();//耗时操作
+        handler=new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case 0:initMonitorsUI();
+                }
+            }
+        };
     }
 
     private void showIndex() {
@@ -456,11 +470,15 @@ public class MainActivity extends BaseActivity {
     private void initMonitors() {
 
 
-        monitors.add(new Monitor("aaa", 26.067144, 119.209095, false, false, false).setmDeviceStatus(new DeviceStatus(false, true, true)).setSearchTime("13:20 ~ 14.20"));
-        monitors.add(new Monitor("bbb", 26.047144, 119.189095, true, false, true).setmDeviceStatus(new DeviceStatus(true, true, true)).setFellTime(new Date("2010/04/04 04:04:04")).setSearchTime("14:50 ~ 15.20"));
-        monitors.add(new Monitor("ccc", 26.047144, 119.209095, false, true, false).setmDeviceStatus(new DeviceStatus(false, false, true)).setFireTime(new Date("2010/01/01 01:01:01")).setSearchTime("16:20 ~ 17.20"));
-        monitors.add(new Monitor("ddd", 26.067144, 119.189095, false, true, false).setmDeviceStatus(new DeviceStatus(true, true, false)).setFireTime(new Date("2010/03/03 03:03:03")).setSearchTime("09:20 ~ 11.20"));
+//        monitors.add(new Monitor("aaa", 26.067144, 119.209095, false, false, false).setmDeviceStatus(new DeviceStatus(false, true, true)).setSearchTime("13:20 ~ 14.20"));
+//        monitors.add(new Monitor("bbb", 26.047144, 119.189095, true, false, true).setmDeviceStatus(new DeviceStatus(true, true, true)).setFellTime(new Date("2010/04/04 04:04:04")).setSearchTime("14:50 ~ 15.20"));
+//        monitors.add(new Monitor("ccc", 26.047144, 119.209095, false, true, false).setmDeviceStatus(new DeviceStatus(false, false, true)).setFireTime(new Date("2010/01/01 01:01:01")).setSearchTime("16:20 ~ 17.20"));
+//        monitors.add(new Monitor("ddd", 26.067144, 119.189095, false, true, false).setmDeviceStatus(new DeviceStatus(true, true, false)).setFireTime(new Date("2010/03/03 03:03:03")).setSearchTime("09:20 ~ 11.20"));
+        GetMonitor getMonitor=new GetMonitor();
+        getMonitor.run();
 
+    }
+    private void initMonitorsUI(){
         //构建Marker图标 相同图案的 icon 的 Marker 最好使用同一个 BitmapDescriptor 对象以节省内存空间
         BitmapDescriptor status_green_eye = BitmapDescriptorFactory
                 .fromResource(R.drawable.map_index_status_green);
@@ -491,7 +509,6 @@ public class MainActivity extends BaseActivity {
             indexMarkers.put(monitor.getForest_id(), markers);
         }
     }
-
     private void initMap() {
         mMapView = (MapView) findViewById(R.id.bmapView);
         mBaiduMap = mMapView.getMap();
@@ -684,15 +701,16 @@ public class MainActivity extends BaseActivity {
         }, 2000);
     }
 
-    class getMonitor implements Runnable {
+    class GetMonitor implements Runnable {
         @Override
         public void run() {
             String token = tokenSharedPreferences.getString("token", "");
+            ShowLog(token);
             AjaxParams params = new AjaxParams();
             params.put("guard_token", token);
 
             FinalHttp fh = new FinalHttp();
-            fh.post("http://120.24.251.94/3w/jalan/forestore/module/guard/forest/guardForest.php", params, new AjaxCallBack() {
+            fh.post("http://120.24.251.94/3w/jalan/forestore/module/guard/forest/forestInfo.php", params, new AjaxCallBack() {
                         @Override
                         public void onLoading(long count, long current) {
                         }
@@ -709,12 +727,14 @@ public class MainActivity extends BaseActivity {
                             ShowLog(o.toString());
                             try {
                                 JSONObject jsonObject = new JSONObject(o.toString());
-                                JSONArray dataArray = jsonObject.getJSONArray("data");
-                                for(int i=0;i<dataArray.length();i++){
-                                    JSONObject forestore=dataArray.getJSONObject(i);
-//                                    monitors.add(new Monitor("aaa", 26.067144, 119.209095, false, false, false).setmDeviceStatus(new DeviceStatus(false, true, true)).setSearchTime("13:20 ~ 14.20"));
-//                                    monitors.add(new Monitor())
+                                JSONObject dataObject = jsonObject.getJSONObject("data");
+                                JSONArray forestArray = dataObject.getJSONArray("forest_arr");
+                                for(int i=0;i<forestArray.length();i++){
+                                    JSONObject forestore=forestArray.getJSONObject(i);
+                                    ShowLog(forestore.getString("forest_id"));
+                                    monitors.add(new Monitor(forestore.getString("forest_id"), forestore.getDouble("longitude"), forestore.getDouble("latitude"), forestore.getBoolean("forest_status"), forestore.getBoolean("is_fire"), forestore.getBoolean("is_log")).setmDeviceStatus(new DeviceStatus(forestore.getBoolean("mic_sta"), forestore.getBoolean("camera_sta"), forestore.getBoolean("com_sta"))).setFireTime(new Date(forestore.getString("fire_date"))).setFellTime(new Date(forestore.getString("log_date"))).setSearchTime(SearchTime[i%SearchTime.length]));
                                 }
+                                handler.sendEmptyMessage(0);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
