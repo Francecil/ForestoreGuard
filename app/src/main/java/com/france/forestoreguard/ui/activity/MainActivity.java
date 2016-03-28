@@ -732,7 +732,7 @@ public class MainActivity extends BaseActivity {
                                 for(int i=0;i<forestArray.length();i++){
                                     JSONObject forestore=forestArray.getJSONObject(i);
                                     ShowLog(forestore.getString("forest_id"));
-                                    monitors.add(new Monitor(forestore.getString("forest_id"), forestore.getDouble("longitude"), forestore.getDouble("latitude"), forestore.getBoolean("forest_status"), forestore.getBoolean("is_fire"), forestore.getBoolean("is_log")).setmDeviceStatus(new DeviceStatus(forestore.getBoolean("mic_sta"), forestore.getBoolean("camera_sta"), forestore.getBoolean("com_sta"))).setFireTime(new Date(forestore.getString("fire_date"))).setFellTime(new Date(forestore.getString("log_date"))).setSearchTime(SearchTime[i%SearchTime.length]));
+                                    monitors.add(new Monitor(forestore.getString("forest_id"), forestore.getDouble("forest_latitude"), forestore.getDouble("forest_longitude"), forestore.getBoolean("forest_status"), forestore.getBoolean("is_fire"), forestore.getBoolean("is_log")).setmDeviceStatus(new DeviceStatus(forestore.getBoolean("mic_sta"), forestore.getBoolean("camera_sta"), forestore.getBoolean("cm_sta"))).setFireTime(forestore.getString("fire_date")).setFellTime(forestore.getString("log_date")).setSearchTime(SearchTime[i%SearchTime.length]));
                                 }
                                 handler.sendEmptyMessage(0);
                             } catch (JSONException e) {

@@ -15,8 +15,8 @@ public class Monitor {
     private DeviceStatus mDeviceStatus;
     private boolean isFired =false;
     private boolean isFelled=false;
-    private Date fireTime;
-    private Date fellTime;
+    private String fireTime;
+    private String fellTime;
     private String searchTime;
     public Monitor(String forest_id,  double latitude,double longitude, boolean forest_status) {
         this.forest_id = forest_id;
@@ -94,20 +94,20 @@ public class Monitor {
         this.isFelled = isFelled;
     }
 
-    public Date getFellTime() {
+    public String getFellTime() {
         return fellTime;
     }
 
-    public Monitor setFellTime(Date fellTime) {
+    public Monitor setFellTime(String fellTime) {
         this.fellTime = fellTime;
         return this;
     }
 
-    public Date getFireTime() {
+    public String getFireTime() {
         return fireTime;
     }
 
-    public Monitor setFireTime(Date fireTime) {
+    public Monitor setFireTime(String fireTime) {
         this.fireTime = fireTime;
         return this;
     }
