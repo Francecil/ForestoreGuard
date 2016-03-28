@@ -62,6 +62,8 @@ public class MainActivity extends BaseActivity {
     private static final int accuracyCircleStrokeColor = 0x00000000;
     //UI
     private Button[] buttonTab;
+    private ImageView backBtn;
+    private TextView title;
     private int index;
     private int currentTabIndex;//当前所处Tap
     //自定义缩放控件
@@ -80,7 +82,9 @@ public class MainActivity extends BaseActivity {
     HashMap<String, List<Marker>> fireMarkers = new HashMap<>();
     HashMap<String, List<Marker>> fellMarkers = new HashMap<>();
     private SharedPreferences tokenSharedPreferences;
-
+    private String Title[]={
+        "Forestore","Fire","Log","Advice"
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -330,7 +334,8 @@ public class MainActivity extends BaseActivity {
         buttonTab[1] = (Button) findViewById(R.id.map_button_fell);
         buttonTab[2] = (Button) findViewById(R.id.map_button_navi);
         buttonTab[3] = (Button) findViewById(R.id.map_button_video);
-        buttonTab[4] = (Button) findViewById(R.id.map_other2index);
+        backBtn = (ImageView) findViewById(R.id.backBtn);
+        title=(TextView)findViewById(R.id.title);
     }
 
     private void initButtonClickListener() {
@@ -546,35 +551,40 @@ public class MainActivity extends BaseActivity {
             case R.id.map_button_video:
                 startAnimActivity(VideoActivity.class);
                 return;
-            case R.id.map_other2index:
+            case R.id.backBtn:
                 index = -1;
                 break;
             default:
                 break;
         }
         cleadAllMarkers();
+        //先把之前的设为没按
         if (currentTabIndex != -1) {
             buttonTab[currentTabIndex].setSelected(false);
         }
         currentTabIndex = index;
         if (index != -1) {
             //把当前tab设为选中状态
-            buttonTab[4].setVisibility(View.VISIBLE);
+            backBtn.setVisibility(View.VISIBLE);
             buttonTab[index].setSelected(true);
             //进入状态index 耗时操作..
             switch (index) {
                 case 0:
+                    title.setText(Title[1]);
                     showFire();
                     break;
                 case 1:
+                    title.setText(Title[2]);
                     showFell();
                     break;
                 case 2:
+                    title.setText(Title[3]);
                     showNavi();
                     break;
             }
         } else {
-            buttonTab[4].setVisibility(View.GONE);
+            backBtn.setVisibility(View.GONE);
+            title.setText(Title[0]);
             showIndex();
             //进入初始状态-1..
         }
