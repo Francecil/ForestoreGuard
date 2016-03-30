@@ -21,6 +21,7 @@ import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
 import com.baidu.mapapi.map.MapStatus;
+import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
@@ -395,29 +396,35 @@ public class MainActivity extends BaseActivity {
                             break;
                         }
                         case MonitorConfig.MONITOR_FIRE: {
-                            if (currentTabIndex != 0) return false;//可能是在fell页点击的时候 fire处于隐藏,重复了
-                            View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_marker_monitor_time, null);
-                            TextView time_day = (TextView) view.findViewById(R.id.time_day);
-                            TextView time_second = (TextView) view.findViewById(R.id.time_second);
-                            SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-                            time_day.setText(df.format(monitor.getFireTime()));
-                            SimpleDateFormat df2 = new SimpleDateFormat("hh:mm:ss");
-                            time_second.setText(df2.format(monitor.getFireTime()));
-                            InfoWindow infoWindownew = new InfoWindow(view, monitor.getLatLng(), 110);
-                            mBaiduMap.showInfoWindow(infoWindownew);
+                            try{
+                                if (currentTabIndex != 0) return false;//可能是在fell页点击的时候 fire处于隐藏,重复了
+                                View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_marker_monitor_time, null);
+                                TextView time_day = (TextView) view.findViewById(R.id.time_day);
+                                TextView time_second = (TextView) view.findViewById(R.id.time_second);
+                                time_day.setText(monitor.getFireTime().substring(0,10));
+                                time_second.setText(monitor.getFireTime().substring(11));
+                                InfoWindow infoWindownew = new InfoWindow(view, monitor.getLatLng(), 110);
+                                mBaiduMap.showInfoWindow(infoWindownew);
+
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
                             break;
                         }
                         case MonitorConfig.MONITOR_FELL: {
                             if (currentTabIndex != 1) return false;//可能是在fell页点击的时候 fire处于隐藏,重复了
-                            View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_marker_monitor_time, null);
-                            TextView time_day = (TextView) view.findViewById(R.id.time_day);
-                            TextView time_second = (TextView) view.findViewById(R.id.time_second);
-                            SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-                            time_day.setText(df.format(monitor.getFellTime()));
-                            SimpleDateFormat df2 = new SimpleDateFormat("hh:mm:ss");
-                            time_second.setText(df2.format(monitor.getFellTime()));
-                            InfoWindow infoWindownew = new InfoWindow(view, monitor.getLatLng(), 110);
-                            mBaiduMap.showInfoWindow(infoWindownew);
+                            try{
+                                View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.view_marker_monitor_time, null);
+                                TextView time_day = (TextView) view.findViewById(R.id.time_day);
+                                TextView time_second = (TextView) view.findViewById(R.id.time_second);
+                                time_day.setText(monitor.getFellTime().substring(0,10));
+                                time_second.setText(monitor.getFellTime().substring(11));
+                                InfoWindow infoWindownew = new InfoWindow(view, monitor.getLatLng(), 110);
+                                mBaiduMap.showInfoWindow(infoWindownew);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+
                             break;
                         }
                     }
@@ -518,17 +525,24 @@ public class MainActivity extends BaseActivity {
         mMapView.showZoomControls(false);
         mZoomControlView = (ZoomControlView) findViewById(R.id.zoomControlView);
         mZoomControlView.setMapView(mMapView);
-        // 开启定位图层
-        mBaiduMap.setMyLocationEnabled(true);
-        // 定位初始化
-        mLocClient = new LocationClient(this);
-        mLocClient.registerLocationListener(myListener);
-        LocationClientOption option = new LocationClientOption();
-        option.setOpenGps(true); // 打开gps
-        option.setCoorType("bd09ll"); // 设置坐标类型
-        option.setScanSpan(1000);
-        mLocClient.setLocOption(option);
-        mLocClient.start();
+        LatLng cenpt = new LatLng(0.00,-50.00);
+        MapStatus mMapStatus = new MapStatus.Builder().target(cenpt)
+                .zoom(14)
+                .build();
+        MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newMapStatus(mMapStatus);
+        //改变地图状态
+        mBaiduMap.setMapStatus(mMapStatusUpdate);
+//        // 开启定位图层
+//        mBaiduMap.setMyLocationEnabled(true);
+//        // 定位初始化
+//        mLocClient = new LocationClient(this);
+//        mLocClient.registerLocationListener(myListener);
+//        LocationClientOption option = new LocationClientOption();
+//        option.setOpenGps(true); // 打开gps
+//        option.setCoorType("bd09ll"); // 设置坐标类型
+//        option.setScanSpan(1000);
+//        mLocClient.setLocOption(option);
+//        mLocClient.start();
     }
 
     //view 转Bitmap
@@ -648,13 +662,18 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        // 退出时销毁定位
-        mLocClient.stop();
-        // 关闭定位图层
-        mBaiduMap.setMyLocationEnabled(false);
+//        // 退出时销毁定位
+//        mLocClient.stop();
+//        // 关闭定位图层
+//        mBaiduMap.setMyLocationEnabled(false);
         //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
-        mMapView.onDestroy();
-        mMapView = null;
+        try{
+            mMapView.onDestroy();
+            mMapView = null;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         super.onDestroy();
     }
 
